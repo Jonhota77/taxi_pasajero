@@ -1,0 +1,52 @@
+name: taxi_pasajero
+description: App de pasajero para la plataforma de taxi propia.
+publish_to: 'none'
+version: 1.0.0+2
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  url_launcher: ^6.3.1
+  http: ^1.2.2
+  package_info_plus: ^8.0.2
+  path_provider: ^2.1.4
+  open_filex: ^4.5.0
+  web_socket_channel: ^3.0.1
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.1
+  geolocator: ^13.0.1
+  shared_preferences: ^2.3.2
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.4.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo_bipy.png
+    - assets/icon/app_icon.png
+
+# NUEVO: genera automaticamente el icono de la app para Android (todos los
+# tamanos que se necesitan) a partir de esta sola imagen.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/app_icon.png"
+
+# NUEVO: pantalla de bienvenida (splash screen) que se ve un instante al
+# abrir la app, antes de que cargue el login.
+flutter_native_splash:
+  color: "#ffffff"
+  image: assets/images/logo_bipy.png
+  android: true
+  ios: false
