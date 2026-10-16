@@ -58,13 +58,26 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
       }
       final pos = await Geolocator.getCurrentPosition();
       if (!_pickupSetManually && mounted) {
-        setState(() => _pickup = LatLng(pos.latitude, pos.longitude));
-        _detectCityHint(LatLng(pos.latitude, pos.longitude));
+        final here = LatLng(pos.latitude, pos.longitude);
+        setState(() {
+          _pickup = here;
+          _error = null;
+        });
+        _detectCityHint(here);
+        // initialCenter del mapa solo se usa al construirlo: hay que mover
+        // la camara cuando llega el GPS real.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_pickupSetManually) _mapController.move(here, 15);
+        });
       }
     } catch (_) {
       if (!_pickupSetManually && mounted) {
-        setState(() => _pickup = _defaultCenter);
-        _detectCityHint(_defaultCenter);
+        // Sin GPS no se adivina la ciudad: se deja el centro por defecto, se
+        // avisa al cliente y no se sesga la busqueda de direcciones a Ipiales.
+        setState(() {
+          _pickup = _defaultCenter;
+          _error = "No pudimos detectar tu ubicacion. Activa el GPS y el permiso de ubicacion, o toca \"Ajustar mi ubicacion\" y marca tu punto de recogida en el mapa.";
+        });
       }
     }
   }
@@ -79,16 +92,21 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
   }
 
   void _handleMapTap(LatLng point) {
+    final adjusting = _adjustingPickup;
     setState(() {
-      if (_adjustingPickup) {
+      if (adjusting) {
         _pickup = point;
         _pickupSetManually = true;
         _adjustingPickup = false;
+        _error = null;
       } else {
         _destination = point;
         _error = null;
       }
     });
+    // Si la recogida se marco a mano (otro pueblo), se actualiza la ciudad
+    // de referencia para la busqueda de direcciones.
+    if (adjusting) _detectCityHint(point);
   }
 
   void _startAdjustingPickup() {
@@ -108,7 +126,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
 
     // Piaggio/domicilios son siempre servicios locales, asi que la busqueda
     // queda encerrada en Ipiales y alrededores, mas la ciudad detectada por GPS.
-    final point = await _geocodingService.search(query, restrictToLocalArea: true, cityHint: _cityHint);
+    final point = await _geocodingService.search(query, restrictToLocalArea: true, cityHint: _cityHint, near: _pickup);
 
     setState(() => _searchingPickup = false);
 
@@ -134,7 +152,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
       _error = null;
     });
 
-    final point = await _geocodingService.search(query, restrictToLocalArea: true, cityHint: _cityHint);
+    final point = await _geocodingService.search(query, restrictToLocalArea: true, cityHint: _cityHint, near: _pickup);
 
     setState(() => _searchingDestination = false);
 

@@ -94,13 +94,26 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
       }
       final pos = await Geolocator.getCurrentPosition();
       if (!_pickupSetManually && mounted) {
-        setState(() => _currentPosition = LatLng(pos.latitude, pos.longitude));
-        _detectCityHint(LatLng(pos.latitude, pos.longitude));
+        final here = LatLng(pos.latitude, pos.longitude);
+        setState(() {
+          _currentPosition = here;
+          _error = null;
+        });
+        _detectCityHint(here);
+        // initialCenter del mapa solo se usa al construirlo: hay que mover
+        // la camara cuando llega el GPS real.
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_pickupSetManually) _mapController.move(here, 15);
+        });
       }
     } catch (_) {
       if (!_pickupSetManually && mounted) {
-        setState(() => _currentPosition = _defaultCenter);
-        _detectCityHint(_defaultCenter);
+        // Sin GPS no se adivina la ciudad: se deja el centro por defecto, se
+        // avisa al pasajero y no se sesga la busqueda de direcciones a Ipiales.
+        setState(() {
+          _currentPosition = _defaultCenter;
+          _error = "No pudimos detectar tu ubicacion. Activa el GPS y el permiso de ubicacion, o toca \"Ajustar mi ubicacion\" y marca tu punto de recogida en el mapa.";
+        });
       }
     }
   }
@@ -115,16 +128,21 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
   }
 
   void _handleMapTap(LatLng point) {
+    final adjusting = _adjustingPickup;
     setState(() {
-      if (_adjustingPickup) {
+      if (adjusting) {
         _currentPosition = point;
         _pickupSetManually = true;
         _adjustingPickup = false;
+        _error = null;
       } else {
         _destination = point;
         _error = null;
       }
     });
+    // Si la recogida se marco a mano (otro pueblo), se actualiza la ciudad
+    // de referencia para la busqueda de direcciones.
+    if (adjusting) _detectCityHint(point);
   }
 
   /// Busca la direccion escrita y coloca el punto de destino solo, sin que
@@ -142,6 +160,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
       query,
       restrictToLocalArea: !_isIntermunicipal,
       cityHint: _isIntermunicipal ? null : _cityHint,
+      near: _isIntermunicipal ? null : _currentPosition,
     );
 
     setState(() => _searchingAddress = false);
