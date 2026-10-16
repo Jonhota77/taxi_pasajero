@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import '../services/update_service.dart';
 
 // Muestra el dialogo de actualizacion disponible. Si info.forceUpdate es
@@ -17,7 +18,7 @@ Future<void> showUpdateDialog(BuildContext context, AppVersionInfo info) async {
           return PopScope(
             canPop: !info.forceUpdate,
             child: AlertDialog(
-              backgroundColor: const Color(0xFF0F1B2B),
+              backgroundColor: AppTheme.navyDeep,
               title: const Text(
                 "Nueva version disponible",
                 style: TextStyle(color: Colors.white),
@@ -28,7 +29,7 @@ Future<void> showUpdateDialog(BuildContext context, AppVersionInfo info) async {
                 children: [
                   Text(
                     "Version ${info.versionName}",
-                    style: const TextStyle(color: Colors.amber, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: AppTheme.yellow, fontWeight: FontWeight.bold),
                   ),
                   if (info.changelog != null && info.changelog!.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -36,7 +37,7 @@ Future<void> showUpdateDialog(BuildContext context, AppVersionInfo info) async {
                   ],
                   if (downloading) ...[
                     const SizedBox(height: 16),
-                    LinearProgressIndicator(value: progress > 0 ? progress : null),
+                    LinearProgressIndicator(value: progress > 0 ? progress : null, color: AppTheme.yellow, backgroundColor: Colors.white24),
                     const SizedBox(height: 8),
                     Text(
                       progress > 0 ? "${(progress * 100).toStringAsFixed(0)}%" : "Descargando...",
@@ -54,7 +55,7 @@ Future<void> showUpdateDialog(BuildContext context, AppVersionInfo info) async {
                           child: const Text("Mas tarde", style: TextStyle(color: Colors.white54)),
                         ),
                       ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                        style: ElevatedButton.styleFrom(backgroundColor: AppTheme.yellow, foregroundColor: AppTheme.navy),
                         onPressed: () async {
                           setState(() => downloading = true);
                           try {

@@ -278,7 +278,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             backgroundColor: Colors.white,
             title: const Row(
               children: [
-                Icon(Icons.schedule, color: AppTheme.primaryOrange),
+                Icon(Icons.schedule, color: AppTheme.navy),
                 SizedBox(width: 10),
                 Text("Viaje programado", style: TextStyle(color: AppTheme.textDark, fontSize: 16)),
               ],
@@ -291,7 +291,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text("Entendido", style: TextStyle(color: AppTheme.actionGreen, fontWeight: FontWeight.bold)),
+                child: const Text("Entendido", style: TextStyle(color: AppTheme.navy, fontWeight: FontWeight.w700)),
               ),
             ],
           ),
@@ -331,11 +331,10 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
     }
 
     return Scaffold(
-      // Barra naranja siempre visible, para los 2 tipos de viaje --
-      // igual que el encabezado de la app de referencia.
+      // Barra azul marino siempre visible, para los 2 tipos de viaje.
       appBar: AppBar(
         title: Text(_isIntermunicipal ? "Servicio especial" : "Taxi"),
-        backgroundColor: AppTheme.primaryOrange,
+        backgroundColor: AppTheme.navy,
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -386,7 +385,10 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                       height: 34,
                       child: Transform.rotate(
                         angle: heading * (3.1415926535 / 180),
-                        child: const Icon(Icons.directions_car, color: Color(0xFF1F2F4A), size: 26),
+                        child: Container(
+                          decoration: const BoxDecoration(color: AppTheme.navy, shape: BoxShape.circle),
+                          child: const Icon(Icons.directions_car, color: AppTheme.yellow, size: 18),
+                        ),
                       ),
                     );
                   }),
@@ -395,14 +397,14 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                       point: _currentPosition!,
                       width: 40,
                       height: 40,
-                      child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 36),
+                      child: const Icon(Icons.person_pin_circle, color: AppTheme.navy, size: 36),
                     ),
                   if (_destination != null)
                     Marker(
                       point: _destination!,
                       width: 40,
                       height: 40,
-                      child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+                      child: const Icon(Icons.location_on, color: AppTheme.danger, size: 40),
                     ),
                 ],
               ),
@@ -416,12 +418,12 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)],
               ),
               child: Text(
                 instruction,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppTheme.textDark),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppTheme.textDark),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -457,8 +459,8 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                       borderRadius: BorderRadius.circular(10),
                       onTap: _startAdjustingPickup,
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        child: Text("Ajustar mi ubicacion", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                        child: Text("Ajustar mi ubicacion", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textDark)),
                       ),
                     ),
                   ),
@@ -470,8 +472,8 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                       borderRadius: BorderRadius.circular(10),
                       onTap: _resetSelection,
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        child: Text("Reiniciar puntos", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                        child: Text("Reiniciar puntos", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textDark)),
                       ),
                     ),
                   ),
@@ -486,12 +488,21 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 16, offset: Offset(0, -2))],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(color: AppTheme.line, borderRadius: BorderRadius.circular(2)),
+                    ),
+                  ),
                   TextField(
                     controller: _destAddressController,
                     textInputAction: TextInputAction.search,
@@ -522,13 +533,13 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _pickScheduledDateTime,
-                          icon: Icon(Icons.schedule, size: 16, color: _scheduledFor != null ? AppTheme.primaryOrange : AppTheme.textDark),
+                          icon: Icon(Icons.schedule, size: 18, color: AppTheme.navy),
                           label: Text(
                             _scheduledFor == null ? "Programar para mas tarde" : _formatScheduledDate(_scheduledFor!),
-                            style: TextStyle(fontSize: 12, color: _scheduledFor != null ? AppTheme.primaryOrange : AppTheme.textDark),
+                            style: TextStyle(fontSize: 14, fontWeight: _scheduledFor != null ? FontWeight.w700 : FontWeight.w500, color: AppTheme.navy),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: _scheduledFor != null ? AppTheme.primaryOrange : Colors.grey.shade400),
+                            side: BorderSide(color: _scheduledFor != null ? AppTheme.navy : const Color(0xFFB6BFCF), width: _scheduledFor != null ? 2 : 1),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                         ),
@@ -555,25 +566,19 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                   ),
                   if (_error != null) ...[
                     const SizedBox(height: 8),
-                    Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                    Text(_error!, style: const TextStyle(color: AppTheme.danger, fontSize: 14, fontWeight: FontWeight.w500)),
                   ],
                   const SizedBox(height: 16),
-                  // Boton de accion principal, verde, como "PEDIR TAXI" en
-                  // la referencia.
+                  // Boton de accion principal: amarillo con texto azul marino
+                  // (estilo definido en AppTheme.light()).
                   ElevatedButton(
                     onPressed: _requesting ? null : _requestTrip,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.actionGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
                     child: _requesting
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppTheme.navy))
                         : Text(
                             _scheduledFor != null
                                 ? "Programar viaje"
                                 : (_isIntermunicipal ? "Solicitar servicio especial" : "Pedir Taxi"),
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                   ),
                 ],

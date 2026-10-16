@@ -253,14 +253,14 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryOrange,
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 16)),
+        backgroundColor: AppTheme.navy,
+        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w600)),
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         actions: [
           TextButton(
             onPressed: _resetSelection,
-            child: const Text("Reiniciar", style: TextStyle(color: Colors.white, fontSize: 12)),
+            child: const Text("Reiniciar", style: TextStyle(color: Colors.white, fontSize: 14)),
           ),
         ],
       ),
@@ -273,7 +273,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
             child: Text(
               instruction,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.bold, fontSize: 13),
+              style: const TextStyle(color: AppTheme.textDark, fontWeight: FontWeight.w600, fontSize: 15),
             ),
           ),
           SizedBox(
@@ -294,9 +294,9 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
                     ),
                     MarkerLayer(markers: [
                       if (_pickup != null)
-                        Marker(point: _pickup!, width: 38, height: 38, child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 32)),
+                        Marker(point: _pickup!, width: 38, height: 38, child: const Icon(Icons.person_pin_circle, color: AppTheme.navy, size: 32)),
                       if (_destination != null)
-                        Marker(point: _destination!, width: 38, height: 38, child: const Icon(Icons.location_on, color: Colors.red, size: 36)),
+                        Marker(point: _destination!, width: 38, height: 38, child: const Icon(Icons.location_on, color: AppTheme.danger, size: 36)),
                     ]),
                   ],
                 ),
@@ -310,8 +310,8 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
                       borderRadius: BorderRadius.circular(10),
                       onTap: _startAdjustingPickup,
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        child: Text("Ajustar mi ubicacion", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppTheme.textDark)),
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+                        child: Text("Ajustar mi ubicacion", style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.textDark)),
                       ),
                     ),
                   ),
@@ -335,7 +335,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
                       labelStyle: const TextStyle(color: AppTheme.textMuted),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTheme.line)),
                       prefixIcon: const Icon(Icons.trip_origin, color: AppTheme.textMuted),
                       suffixIcon: _searchingPickup
                           ? const Padding(
@@ -359,7 +359,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
                       labelStyle: const TextStyle(color: AppTheme.textMuted),
                       filled: true,
                       fillColor: Colors.white,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTheme.line)),
                       prefixIcon: const Icon(Icons.place_outlined, color: AppTheme.textMuted),
                       suffixIcon: _searchingDestination
                           ? const Padding(
@@ -388,19 +388,14 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
                   _field(_notesController, "Notas adicionales (opcional)", maxLines: 2),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
-                    Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                    Text(_error!, style: const TextStyle(color: AppTheme.danger, fontSize: 14, fontWeight: FontWeight.w500)),
                   ],
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _requesting ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.actionGreen,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
                     child: _requesting
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : const Text("Solicitar", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppTheme.navy))
+                        : const Text("Solicitar"),
                   ),
                 ],
               ),
@@ -422,7 +417,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
         labelStyle: const TextStyle(color: AppTheme.textMuted),
         filled: true,
         fillColor: Colors.white,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppTheme.line)),
       ),
     );
   }

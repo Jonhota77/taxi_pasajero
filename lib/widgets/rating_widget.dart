@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 /// Widget reutilizable de calificación con estrellas + comentario opcional.
 /// Se usa dentro de trip_status_screen.dart cuando el viaje ya se completó.
@@ -41,13 +42,13 @@ class _RatingWidgetState extends State<RatingWidget> {
     if (_submitted) {
       return Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.green.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+        decoration: BoxDecoration(color: AppTheme.success.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(12)),
         child: const Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle, color: Colors.greenAccent, size: 20),
+            Icon(Icons.check_circle, color: AppTheme.successOnDark, size: 20),
             SizedBox(width: 8),
-            Text("Gracias por tu calificacion", style: TextStyle(color: Colors.greenAccent, fontWeight: FontWeight.bold)),
+            Text("Gracias por tu calificacion", style: TextStyle(color: AppTheme.successOnDark, fontWeight: FontWeight.bold)),
           ],
         ),
       );
@@ -67,7 +68,7 @@ class _RatingWidgetState extends State<RatingWidget> {
               return IconButton(
                 icon: Icon(
                   starValue <= _selectedScore ? Icons.star : Icons.star_border,
-                  color: Colors.amber,
+                  color: AppTheme.yellow,
                   size: 32,
                 ),
                 onPressed: () => setState(() => _selectedScore = starValue),
@@ -86,12 +87,14 @@ class _RatingWidgetState extends State<RatingWidget> {
                 filled: true,
                 fillColor: Colors.white10,
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppTheme.yellow)),
               ),
             ),
             const SizedBox(height: 10),
             ElevatedButton(
               onPressed: _submitting ? null : _submit,
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.yellow, foregroundColor: AppTheme.navy),
               child: _submitting
                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
                   : const Text("Enviar calificacion", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),

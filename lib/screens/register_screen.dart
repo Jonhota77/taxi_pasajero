@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -44,37 +45,48 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1B2B),
-      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
-      body: Padding(
+      backgroundColor: AppTheme.background,
+      appBar: AppBar(title: const Text("Crear cuenta")),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
-              "Crear cuenta",
-              style: TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold),
-            ),
+            const SizedBox(height: 8),
+            _buildField(_nameController, "Nombre completo", TextInputType.name, icon: Icons.person_outline),
+            const SizedBox(height: 16),
+            _buildField(_phoneController, "Número de teléfono", TextInputType.phone, icon: Icons.phone_outlined),
+            const SizedBox(height: 16),
+            _buildField(_passwordController, "Contraseña", TextInputType.text, obscure: true, icon: Icons.lock_outline),
             const SizedBox(height: 24),
-            _buildField(_nameController, "Nombre completo", TextInputType.name),
-            const SizedBox(height: 16),
-            _buildField(_phoneController, "Número de teléfono", TextInputType.phone),
-            const SizedBox(height: 16),
-            _buildField(_passwordController, "Contraseña", TextInputType.text, obscure: true),
-            const SizedBox(height: 24),
-            if (_error != null) Text(_error!, style: const TextStyle(color: Colors.redAccent)),
-            if (_success) const Text("¡Cuenta creada! Ya puedes iniciar sesión.", style: TextStyle(color: Colors.greenAccent)),
-            const SizedBox(height: 16),
+            if (_error != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.error_outline, color: AppTheme.danger, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(_error!, style: const TextStyle(color: AppTheme.danger, fontSize: 15, fontWeight: FontWeight.w500))),
+                  ],
+                ),
+              ),
+            if (_success)
+              const Padding(
+                padding: EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    Icon(Icons.check_circle_outline, color: AppTheme.success, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(child: Text("¡Cuenta creada! Ya puedes iniciar sesión.", style: TextStyle(color: AppTheme.success, fontSize: 15, fontWeight: FontWeight.w600))),
+                  ],
+                ),
+              ),
             ElevatedButton(
               onPressed: _loading ? null : _register,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.amber,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
               child: _loading
-                  ? const CircularProgressIndicator(color: Colors.black)
-                  : const Text("Registrarme", style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppTheme.navy))
+                  : const Text("Registrarme"),
             ),
           ],
         ),
@@ -82,18 +94,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildField(TextEditingController controller, String label, TextInputType type, {bool obscure = false}) {
+  Widget _buildField(TextEditingController controller, String label, TextInputType type, {bool obscure = false, IconData? icon}) {
     return TextField(
       controller: controller,
       keyboardType: type,
       obscureText: obscure,
-      style: const TextStyle(color: Colors.white),
+      style: const TextStyle(color: AppTheme.textDark, fontSize: 17),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: Colors.white54),
-        filled: true,
-        fillColor: Colors.white10,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        prefixIcon: icon != null ? Icon(icon) : null,
       ),
     );
   }

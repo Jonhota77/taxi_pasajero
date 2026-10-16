@@ -9,6 +9,7 @@ import '../services/trip_service.dart';
 import '../services/rating_service.dart';
 import '../widgets/rating_widget.dart';
 import '../services/map_theme.dart';
+import '../theme/app_theme.dart';
 
 class TripStatusScreen extends StatefulWidget {
   final String tripId;
@@ -215,10 +216,10 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
     final isExpanded = _panelExpanded || forceExpanded;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1B2B),
+      backgroundColor: AppTheme.navyDeep,
       body: Stack(
         children: [
-          if (_hasMap) Positioned.fill(child: _buildMap()) else const Center(child: CircularProgressIndicator(color: Colors.amber)),
+          if (_hasMap) Positioned.fill(child: _buildMap()) else const Center(child: CircularProgressIndicator(color: AppTheme.yellow)),
 
           // Panel inferior: franja pequena por defecto, se despliega al tocarla.
           Positioned(
@@ -230,7 +231,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
               curve: Curves.easeOut,
               height: isExpanded ? screenHeight * 0.55 : 110,
               decoration: const BoxDecoration(
-                color: Color(0xFF0F1B2B),
+                color: AppTheme.navyDeep,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [BoxShadow(color: Colors.black45, blurRadius: 12)],
               ),
@@ -277,7 +278,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                             if (_status == "pending_confirmation" && _proposedPrice != null) ...[
                               Text(
                                 "Precio propuesto: \$${_proposedPrice!.toStringAsFixed(0)} COP",
-                                style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: AppTheme.yellow, fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 14),
                               Row(
@@ -285,15 +286,15 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                                   Expanded(
                                     child: OutlinedButton(
                                       onPressed: _deciding ? null : () => _respondToOffer(false),
-                                      style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.redAccent), minimumSize: const Size.fromHeight(44)),
-                                      child: const Text("Rechazar", style: TextStyle(color: Colors.redAccent)),
+                                      style: OutlinedButton.styleFrom(side: const BorderSide(color: AppTheme.dangerOnDark), minimumSize: const Size.fromHeight(44)),
+                                      child: const Text("Rechazar", style: TextStyle(color: AppTheme.dangerOnDark)),
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: _deciding ? null : () => _respondToOffer(true),
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.green, minimumSize: const Size.fromHeight(44)),
+                                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.success, minimumSize: const Size.fromHeight(44)),
                                       child: _deciding
                                           ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                                           : const Text("Aceptar", style: TextStyle(color: Colors.white)),
@@ -305,7 +306,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                             if (_status != "pending_confirmation" && _price != null) ...[
                               Text(
                                 "Precio acordado: \$${_price!.toStringAsFixed(0)} COP",
-                                style: const TextStyle(color: Colors.amber, fontSize: 18, fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: AppTheme.yellow, fontSize: 18, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 14),
                             ],
@@ -315,7 +316,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                                 icon: const Icon(Icons.call, color: Colors.white),
                                 label: Text("Llamar a $_driverName", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
+                                  backgroundColor: AppTheme.success,
                                   minimumSize: const Size.fromHeight(48),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                 ),
@@ -327,7 +328,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                             if (_finalPrice != null) ...[
                               Text(
                                 "Total: \$${_finalPrice!.toStringAsFixed(0)} COP",
-                                style: const TextStyle(color: Colors.amber, fontSize: 20, fontWeight: FontWeight.bold),
+                                style: const TextStyle(color: AppTheme.yellow, fontSize: 20, fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 16),
                               RatingWidget(
@@ -339,7 +340,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                               const SizedBox(height: 16),
                               ElevatedButton(
                                 onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-                                style: ElevatedButton.styleFrom(backgroundColor: Colors.amber, minimumSize: const Size.fromHeight(48)),
+                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.yellow, minimumSize: const Size.fromHeight(48)),
                                 child: const Text("Volver al inicio", style: TextStyle(color: Colors.black)),
                               ),
                             ],
@@ -391,8 +392,8 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
               },
             ),
             MarkerLayer(markers: [
-              Marker(point: origin, width: 36, height: 36, child: const Icon(Icons.person_pin_circle, color: Colors.blue, size: 32)),
-              Marker(point: destination, width: 36, height: 36, child: const Icon(Icons.location_on, color: Colors.red, size: 34)),
+              Marker(point: origin, width: 36, height: 36, child: const Icon(Icons.person_pin_circle, color: AppTheme.navy, size: 32)),
+              Marker(point: destination, width: 36, height: 36, child: const Icon(Icons.location_on, color: AppTheme.danger, size: 34)),
               if (_driverPosition != null)
                 Marker(
                   point: _driverPosition!,
@@ -400,7 +401,10 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                   height: 32,
                   child: Transform.rotate(
                     angle: _driverHeading * (3.1415926535 / 180),
-                    child: const Icon(Icons.directions_car, color: Colors.amber, size: 28),
+                    child: Container(
+                      decoration: const BoxDecoration(color: AppTheme.navy, shape: BoxShape.circle),
+                      child: const Icon(Icons.directions_car, color: AppTheme.yellow, size: 20),
+                    ),
                   ),
                 ),
             ]),
@@ -417,7 +421,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                 shape: const CircleBorder(),
                 elevation: 3,
                 child: IconButton(
-                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 18, color: const Color(0xFF0F1B2B)),
+                  icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, size: 18, color: AppTheme.navyDeep),
                   tooltip: isDark ? "Mapa claro" : "Mapa oscuro",
                   onPressed: MapTheme.toggle,
                 ),
@@ -454,8 +458,8 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
           const Text("Formas de pago", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
           const SizedBox(height: 10),
           if (_nequiNumber != null) _paymentRow("Nequi", _nequiNumber!, Colors.pinkAccent),
-          if (_daviplataNumber != null) _paymentRow("Daviplata", _daviplataNumber!, Colors.redAccent),
-          _paymentRow("Efectivo", "Sin problema, paga directo al conductor", Colors.greenAccent),
+          if (_daviplataNumber != null) _paymentRow("Daviplata", _daviplataNumber!, AppTheme.dangerOnDark),
+          _paymentRow("Efectivo", "Sin problema, paga directo al conductor", AppTheme.successOnDark),
         ],
       ),
     );
@@ -478,15 +482,15 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
   Widget _buildStatusIcon({double size = 56}) {
     switch (_status) {
       case "pending_confirmation":
-        return Icon(Icons.help_outline, color: Colors.amber, size: size);
+        return Icon(Icons.help_outline, color: AppTheme.yellow, size: size);
       case "accepted":
-        return Icon(Icons.directions_car, color: Colors.amber, size: size);
+        return Icon(Icons.directions_car, color: AppTheme.yellow, size: size);
       case "in_progress":
-        return Icon(Icons.navigation, color: Colors.greenAccent, size: size);
+        return Icon(Icons.navigation, color: AppTheme.successOnDark, size: size);
       case "completed":
-        return Icon(Icons.check_circle, color: Colors.greenAccent, size: size);
+        return Icon(Icons.check_circle, color: AppTheme.successOnDark, size: size);
       default:
-        return SizedBox(width: size, height: size, child: const CircularProgressIndicator(color: Colors.amber, strokeWidth: 2));
+        return SizedBox(width: size, height: size, child: const CircularProgressIndicator(color: AppTheme.yellow, strokeWidth: 2));
     }
   }
 }

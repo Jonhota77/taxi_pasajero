@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config.dart';
 import '../services/auth_service.dart';
 import '../services/order_service.dart';
+import '../theme/app_theme.dart';
 
 class OrderStatusScreen extends StatefulWidget {
   final String orderId;
@@ -151,7 +152,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1B2B),
+      backgroundColor: AppTheme.navyDeep,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -172,7 +173,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                     children: [
                       Text(
                         "Precio propuesto: \$${_proposedPrice!.toStringAsFixed(0)} COP",
-                        style: const TextStyle(color: Colors.amber, fontSize: 22, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: AppTheme.yellow, fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 16),
                       Row(
@@ -180,15 +181,15 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                           Expanded(
                             child: OutlinedButton(
                               onPressed: _deciding ? null : () => _respondToOffer(false),
-                              style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.redAccent)),
-                              child: const Text("Rechazar", style: TextStyle(color: Colors.redAccent)),
+                              style: OutlinedButton.styleFrom(side: const BorderSide(color: AppTheme.dangerOnDark)),
+                              child: const Text("Rechazar", style: TextStyle(color: AppTheme.dangerOnDark)),
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: ElevatedButton(
                               onPressed: _deciding ? null : () => _respondToOffer(true),
-                              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.success),
                               child: _deciding
                                   ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                                   : const Text("Aceptar", style: TextStyle(color: Colors.white)),
@@ -205,7 +206,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                 const SizedBox(height: 12),
                 Text(
                   "Precio acordado: \$${_price!.toStringAsFixed(0)} COP",
-                  style: const TextStyle(color: Colors.amber, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: AppTheme.yellow, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
               ],
               // NUEVO: boton de llamada, visible mientras el pedido esta
@@ -217,7 +218,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                   icon: const Icon(Icons.call, color: Colors.white),
                   label: Text("Llamar a $_driverName", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: AppTheme.success,
                     padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
@@ -231,7 +232,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: () => Navigator.of(context).popUntil((r) => r.isFirst),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.amber),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.yellow),
                   child: const Text("Volver al inicio", style: TextStyle(color: Colors.black)),
                 ),
               ],
@@ -252,8 +253,8 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
           const Text("Formas de pago", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
           const SizedBox(height: 10),
           if (_nequiNumber != null) _paymentRow("Nequi", _nequiNumber!, Colors.pinkAccent),
-          if (_daviplataNumber != null) _paymentRow("Daviplata", _daviplataNumber!, Colors.redAccent),
-          _paymentRow("Efectivo", "Sin problema, paga directo al conductor", Colors.greenAccent),
+          if (_daviplataNumber != null) _paymentRow("Daviplata", _daviplataNumber!, AppTheme.dangerOnDark),
+          _paymentRow("Efectivo", "Sin problema, paga directo al conductor", AppTheme.successOnDark),
         ],
       ),
     );
@@ -276,15 +277,15 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
   Widget _buildIcon() {
     switch (_status) {
       case "pending_confirmation":
-        return const Icon(Icons.help_outline, color: Colors.amber, size: 72);
+        return const Icon(Icons.help_outline, color: AppTheme.yellow, size: 72);
       case "accepted":
-        return const Icon(Icons.local_shipping, color: Colors.amber, size: 72);
+        return const Icon(Icons.local_shipping, color: AppTheme.yellow, size: 72);
       case "picked_up":
-        return const Icon(Icons.navigation, color: Colors.greenAccent, size: 72);
+        return const Icon(Icons.navigation, color: AppTheme.successOnDark, size: 72);
       case "completed":
-        return const Icon(Icons.check_circle, color: Colors.greenAccent, size: 72);
+        return const Icon(Icons.check_circle, color: AppTheme.successOnDark, size: 72);
       default:
-        return const CircularProgressIndicator(color: Colors.amber);
+        return const CircularProgressIndicator(color: AppTheme.yellow);
     }
   }
 }

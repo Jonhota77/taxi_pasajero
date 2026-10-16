@@ -54,8 +54,7 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
                 await Geolocator.openLocationSettings();
                 if (context.mounted) Navigator.of(context).pop();
               },
-              style: ElevatedButton.styleFrom(backgroundColor: AppTheme.actionGreen),
-              child: const Text("Activar", style: TextStyle(color: Colors.white)),
+              child: const Text("Activar"),
             ),
           ],
         ),
@@ -91,7 +90,7 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
         backgroundColor: Colors.white,
         title: const Row(
           children: [
-            Icon(Icons.campaign, color: AppTheme.primaryOrange),
+            Icon(Icons.campaign, color: AppTheme.navy),
             SizedBox(width: 10),
             Text("Bipy", style: TextStyle(color: AppTheme.textDark, fontSize: 16, fontWeight: FontWeight.bold)),
           ],
@@ -100,7 +99,7 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Entendido", style: TextStyle(color: AppTheme.actionGreen, fontWeight: FontWeight.bold)),
+            child: const Text("Entendido", style: TextStyle(color: AppTheme.navy, fontWeight: FontWeight.w700)),
           ),
         ],
       ),
@@ -115,41 +114,48 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: SafeArea(
-        child: Column(
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: Column(
           children: [
-            // Barra superior naranja, para que se vea consistente con el login.
+            // Cabecera azul marino, consistente con el login.
             Container(
               width: double.infinity,
-              color: AppTheme.primaryOrange,
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Image.asset("assets/images/logo_bipy.png", height: 32),
-                  ],
+              decoration: const BoxDecoration(
+                color: AppTheme.navy,
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                      child: Image.asset("assets/images/logo_bipy.png", height: 34),
+                    ),
+                  ),
                 ),
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.fromLTRB(24, 28, 24, 24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Text("¿Qué necesitas hoy?",
-                        style: TextStyle(color: AppTheme.textDark, fontSize: 22, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 24),
+                        style: TextStyle(color: AppTheme.textDark, fontSize: 28, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 20),
                     _ServiceCard(
                       icon: Icons.local_taxi,
                       title: "Taxi",
                       subtitle: "Viaje de pasajero, origen a destino",
-                      color: AppTheme.primaryOrange,
+                      featured: true,
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const HomeMapScreen(category: "taxi")),
                       ),
@@ -159,7 +165,6 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
                       icon: Icons.airport_shuttle,
                       title: "Servicio especial",
                       subtitle: "Servicio público, buses, camionetas, vans, a nivel nacional",
-                      color: Colors.deepPurple,
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const HomeMapScreen(category: "intermunicipal")),
                       ),
@@ -169,7 +174,6 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
                       icon: Icons.local_shipping,
                       title: "Transporte de carga",
                       subtitle: "Piaggios, buses, camiones, turbo",
-                      color: Colors.blueAccent,
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const OrderRequestScreen(serviceType: "piaggio")),
                       ),
@@ -179,7 +183,6 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
                       icon: Icons.delivery_dining,
                       title: "Domicilios",
                       subtitle: null,
-                      color: AppTheme.actionGreen,
                       onTap: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const OrderRequestScreen(serviceType: "delivery")),
                       ),
@@ -195,52 +198,70 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
   }
 }
 
+/// Tarjeta de servicio. La del servicio principal ([featured]) va en azul
+/// marino con el icono amarillo; las demas, en blanco con borde fino.
 class _ServiceCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String? subtitle;
-  final Color color;
+  final bool featured;
   final VoidCallback onTap;
 
   const _ServiceCard({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.color,
     required this.onTap,
+    this.featured = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: AppTheme.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 8, offset: const Offset(0, 2))],
-        ),
-        child: Row(
-          children: [
-            CircleAvatar(radius: 26, backgroundColor: color.withOpacity(0.15), child: Icon(icon, color: color, size: 26)),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(title, style: const TextStyle(color: AppTheme.textDark, fontSize: 16, fontWeight: FontWeight.bold)),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 2),
-                    Text(subtitle!, style: const TextStyle(color: AppTheme.textMuted, fontSize: 12)),
-                  ],
-                ],
-              ),
+    final titleColor = featured ? Colors.white : AppTheme.textDark;
+    final subtitleColor = featured ? const Color(0xFFC9D4E8) : AppTheme.textMuted;
+    final tileColor = featured ? AppTheme.yellow : AppTheme.navy.withValues(alpha: 0.08);
+
+    return Material(
+      color: featured ? AppTheme.navy : AppTheme.cardBackground,
+      elevation: featured ? 3 : 0,
+      shadowColor: AppTheme.navy.withValues(alpha: 0.35),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: featured ? AppTheme.navy : AppTheme.line),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 80),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(color: tileColor, borderRadius: BorderRadius.circular(14)),
+                  child: Icon(icon, color: AppTheme.navy, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(title, style: TextStyle(color: titleColor, fontSize: 19, fontWeight: FontWeight.w700)),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: 2),
+                        Text(subtitle!, style: TextStyle(color: subtitleColor, fontSize: 14)),
+                      ],
+                    ],
+                  ),
+                ),
+                Icon(Icons.chevron_right, color: featured ? AppTheme.yellow : AppTheme.textMuted),
+              ],
             ),
-            const Icon(Icons.chevron_right, color: AppTheme.textMuted),
-          ],
+          ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'register_screen.dart';
@@ -44,92 +45,102 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Barra superior naranja, igual al estilo de referencia.
-            Container(
-              width: double.infinity,
-              color: AppTheme.primaryOrange,
-              padding: const EdgeInsets.symmetric(vertical: 24),
-              child: Column(
-                children: [
-                  // NUEVO: logo real de Bipy, con tarjeta blanca detrás para
-                  // que resalte bien sobre el naranja (el dorado del logo
-                  // se perderia si quedara directo sobre este color).
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14)),
-                    child: Image.asset("assets/images/logo_bipy.png", height: 70),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: AppTheme.background,
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Cabecera azul marino con el logo sobre un recuadro blanco
+              // (los colores del logo se perderian directo sobre el azul).
+              Container(
+                decoration: const BoxDecoration(
+                  color: AppTheme.navy,
+                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(32)),
+                ),
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+                    child: Column(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+                          child: Image.asset("assets/images/logo_bipy.png", height: 76),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          "Muévete fácil, llega seguro",
+                          style: TextStyle(color: AppTheme.yellow, fontSize: 17, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    "Muévete fácil, llega seguro",
-                    style: TextStyle(color: Colors.white, fontSize: 13, fontStyle: FontStyle.italic),
-                  ),
-                ],
+                ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildField(_phoneController, "Número de teléfono", TextInputType.phone),
+                    const Text(
+                      "Ingresa a tu cuenta",
+                      style: TextStyle(color: AppTheme.textDark, fontSize: 26, fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 24),
+                    _buildField(_phoneController, "Número de teléfono", TextInputType.phone, icon: Icons.phone_outlined),
                     const SizedBox(height: 16),
-                    _buildField(_passwordController, "Contraseña", TextInputType.text, obscure: true),
+                    _buildField(_passwordController, "Contraseña", TextInputType.text, obscure: true, icon: Icons.lock_outline),
                     const SizedBox(height: 24),
                     if (_error != null)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16),
-                        child: Text(_error!, style: const TextStyle(color: Colors.red)),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.error_outline, color: AppTheme.danger, size: 20),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(_error!, style: const TextStyle(color: AppTheme.danger, fontSize: 15, fontWeight: FontWeight.w500)),
+                            ),
+                          ],
+                        ),
                       ),
                     ElevatedButton(
                       onPressed: _loading ? null : _login,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.actionGreen,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
                       child: _loading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : const Text("Ingresar", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5, color: AppTheme.navy))
+                          : const Text("Ingresar"),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
                     TextButton(
                       onPressed: () => Navigator.of(context).push(
                         MaterialPageRoute(builder: (_) => const RegisterScreen()),
                       ),
-                      child: const Text("¿No tienes cuenta? Regístrate", style: TextStyle(color: AppTheme.textMuted)),
+                      child: const Text("¿No tienes cuenta? Regístrate"),
                     ),
                   ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildField(TextEditingController controller, String label, TextInputType type, {bool obscure = false}) {
+  Widget _buildField(TextEditingController controller, String label, TextInputType type, {bool obscure = false, IconData? icon}) {
     return TextField(
       controller: controller,
       keyboardType: type,
       obscureText: obscure,
-      style: const TextStyle(color: AppTheme.textDark),
+      style: const TextStyle(color: AppTheme.textDark, fontSize: 17),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: AppTheme.textMuted),
-        filled: true,
-        fillColor: AppTheme.cardBackground,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFDDDDDD))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primaryOrange)),
+        prefixIcon: icon != null ? Icon(icon) : null,
       ),
     );
   }
