@@ -1,7 +1,7 @@
 name: taxi_pasajero
 description: App de pasajero para la plataforma de taxi propia.
 publish_to: 'none'
-version: 1.0.2+4
+version: 1.0.3+5
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -46,6 +46,7 @@ flutter:
   assets:
     - assets/images/logo_bipy.png
     - assets/icon/app_icon.png
+    - assets/marcadores/
 
 # NUEVO: genera automaticamente el icono de la app para Android (todos los
 # tamanos que se necesitan) a partir de esta sola imagen.

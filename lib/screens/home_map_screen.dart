@@ -381,14 +381,11 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
                     final heading = (d["heading"] as num?)?.toDouble() ?? 0;
                     return Marker(
                       point: LatLng(lat, lng),
-                      width: 34,
-                      height: 34,
+                      width: 30,
+                      height: 44,
                       child: Transform.rotate(
                         angle: heading * (3.1415926535 / 180),
-                        child: Container(
-                          decoration: const BoxDecoration(color: AppTheme.navy, shape: BoxShape.circle),
-                          child: const Icon(Icons.directions_car, color: AppTheme.yellow, size: 18),
-                        ),
+                        child: Image.asset('assets/marcadores/carro_encendido.png', width: 20, height: 40),
                       ),
                     );
                   }),

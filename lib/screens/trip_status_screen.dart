@@ -397,14 +397,11 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
               if (_driverPosition != null)
                 Marker(
                   point: _driverPosition!,
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 50,
                   child: Transform.rotate(
                     angle: _driverHeading * (3.1415926535 / 180),
-                    child: Container(
-                      decoration: const BoxDecoration(color: AppTheme.navy, shape: BoxShape.circle),
-                      child: const Icon(Icons.directions_car, color: AppTheme.yellow, size: 20),
-                    ),
+                    child: Image.asset('assets/marcadores/carro_encendido.png', width: 22, height: 44),
                   ),
                 ),
             ]),
