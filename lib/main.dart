@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'services/auth_service.dart';
+import 'services/inactivity_reminder.dart';
 import 'screens/login_screen.dart';
 import 'screens/service_selector_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
   runApp(const TaxiPasajeroApp());
+  InactivityReminder.instance.schedule();
 }
 
 class TaxiPasajeroApp extends StatelessWidget {
@@ -70,6 +72,10 @@ class _StartupGateState extends State<_StartupGate> with WidgetsBindingObserver 
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Reprograma el aviso de "4 dias sin usar la app" al abrir y al salir.
+    if (state == AppLifecycleState.resumed || state == AppLifecycleState.paused) {
+      InactivityReminder.instance.schedule();
+    }
     if (state == AppLifecycleState.resumed) {
       _validateSessionOnResume();
     }
