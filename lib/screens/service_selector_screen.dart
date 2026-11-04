@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
 import '../services/trip_service.dart';
+import '../widgets/account_sheet.dart';
 import 'home_map_screen.dart';
+import 'login_screen.dart';
 import 'order_request_screen.dart';
 
 class ServiceSelectorScreen extends StatefulWidget {
@@ -106,6 +108,27 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
     );
   }
 
+  Future<void> _logout() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Cerrar sesión"),
+        content: const Text("¿Seguro que quieres cerrar sesión?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: const Text("Cancelar")),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: const Text("Cerrar sesión")),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    await _authService.logout();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
+  }
+
   @override
   void dispose() {
     _channel?.sink.close();
@@ -131,13 +154,20 @@ class _ServiceSelectorScreenState extends State<ServiceSelectorScreen> {
                 bottom: false,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(24, 12, 24, 20),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
-                      child: Image.asset("assets/images/logo_bipy.png", height: 34),
-                    ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)),
+                        child: Image.asset("assets/images/logo_bipy.png", height: 34),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.account_circle_outlined, color: Colors.white, size: 30),
+                        tooltip: "Mi cuenta",
+                        onPressed: () => showAccountSheet(context, onLogout: _logout),
+                      ),
+                    ],
                   ),
                 ),
               ),

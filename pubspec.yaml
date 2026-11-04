@@ -1,7 +1,7 @@
 name: taxi_pasajero
 description: App de pasajero para la plataforma de taxi propia.
 publish_to: 'none'
-version: 1.0.4+6
+version: 1.0.5+7
 
 environment:
   sdk: '>=3.3.0 <4.0.0'

@@ -122,6 +122,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       child: const Text("¿No tienes cuenta? Regístrate"),
                     ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      "¿Olvidaste tu contraseña? Pide a la secretaría de Bipy que te la restablezca.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppTheme.textMuted, fontSize: 13.5),
+                    ),
                   ],
                 ),
               ),

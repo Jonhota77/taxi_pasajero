@@ -61,6 +61,41 @@ class AuthService {
     return null; // Ã©xito
   }
 
+  /// Cambia la contraseña del usuario con sesion iniciada.
+  /// Devuelve null si salio bien, o el texto del error para mostrarlo.
+  Future<String?> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    final token = await getToken();
+    if (token == null) return "Tu sesión venció. Vuelve a ingresar.";
+    try {
+      final res = await http.post(
+        Uri.parse("${AppConfig.apiBaseUrl}/auth/change-password"),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
+        body: jsonEncode({
+          "current_password": currentPassword,
+          "new_password": newPassword,
+        }),
+      );
+      if (res.statusCode == 200) return null;
+      if (res.statusCode == 401) return "Tu sesión venció. Vuelve a ingresar.";
+      if (res.statusCode == 429) {
+        return "Demasiados intentos. Espera un minuto e inténtalo de nuevo.";
+      }
+      try {
+        final body = jsonDecode(res.body);
+        if (body is Map && body["detail"] is String) return body["detail"] as String;
+      } catch (_) {}
+      return "No se pudo cambiar la contraseña. Revisa los datos.";
+    } catch (_) {
+      return "Sin conexión. Revisa tu internet e inténtalo de nuevo.";
+    }
+  }
+
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);

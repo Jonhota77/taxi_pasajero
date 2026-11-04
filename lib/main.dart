@@ -106,6 +106,8 @@ class _StartupGateState extends State<_StartupGate> with WidgetsBindingObserver 
   /// limpiando cualquier pantalla en la que estuviera navegando.
   Future<void> _validateSessionOnResume() async {
     if (!_loggedIn) return;
+    // Si el usuario cerro sesion a mano ya no hay token: no es una sesion vencida.
+    if (!await _authService.isLoggedIn()) return;
 
     final valid = await _authService.validateToken();
     if (!valid) {
