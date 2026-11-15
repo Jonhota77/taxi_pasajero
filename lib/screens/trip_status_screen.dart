@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../widgets/driver_avatar.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -29,6 +30,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
   String _statusText = "Buscando un conductor cercano...";
   String? _driverName;
   String? _driverPhone;
+  String? _driverPhotoUrl;
   double? _price;
   double? _finalPrice;
   double? _proposedPrice;
@@ -74,6 +76,8 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
         _nequiNumber = trip["nequi_number"];
         _daviplataNumber = trip["daviplata_number"];
         _driverPhone = trip["driver_phone"];
+        _driverPhotoUrl = trip["driver_photo_url"];
+        _driverName = trip["driver_name"] ?? _driverName;
       });
       if (_status == "accepted" || _status == "in_progress") {
         _startDriverLocationPolling();
@@ -120,6 +124,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
         case "trip_counter_offer":
           _status = "pending_confirmation";
           _driverName = data["driver_name"];
+          _driverPhotoUrl = data["driver_photo_url"];
           _proposedPrice = (data["proposed_price"] as num?)?.toDouble();
           _statusText = "$_driverName propone un precio distinto";
           _panelExpanded = true; // hay que decidir, se muestra de una
@@ -127,6 +132,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
         case "trip_accepted":
           _status = "accepted";
           _driverName = data["driver_name"];
+          _driverPhotoUrl = data["driver_photo_url"];
           _price = (data["price"] as num?)?.toDouble();
           _nequiNumber = data["nequi_number"];
           _daviplataNumber = data["daviplata_number"];
@@ -177,6 +183,7 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
           _nequiNumber = trip["nequi_number"];
           _daviplataNumber = trip["daviplata_number"];
           _driverPhone = trip["driver_phone"];
+          _driverPhotoUrl = trip["driver_photo_url"] ?? _driverPhotoUrl;
           _statusText = "Precio confirmado. El conductor va en camino.";
           _panelExpanded = false;
         });
@@ -205,6 +212,11 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
   }
 
   bool get _hasMap => _originPoint != null && _destinationPoint != null;
+
+  // Se muestra al conductor (foto y nombre) cuando ya hay uno asignado o proponiendo precio.
+  bool get _showDriver =>
+      _driverName != null &&
+      const {"pending_confirmation", "accepted", "arriving", "in_progress", "completed"}.contains(_status);
 
   @override
   Widget build(BuildContext context) {
@@ -249,6 +261,10 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              if (_showDriver && _driverPhotoUrl != null) ...[
+                                DriverAvatar(photoUrl: _driverPhotoUrl, size: 32),
+                                const SizedBox(width: 8),
+                              ],
                               _buildStatusIcon(size: 20),
                               const SizedBox(width: 8),
                               Flexible(
@@ -275,6 +291,10 @@ class _TripStatusScreenState extends State<TripStatusScreen> {
                         padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                         child: Column(
                           children: [
+                            if (_showDriver) ...[
+                              DriverCard(name: _driverName, photoUrl: _driverPhotoUrl),
+                              const SizedBox(height: 14),
+                            ],
                             if (_status == "pending_confirmation" && _proposedPrice != null) ...[
                               Text(
                                 "Precio propuesto: \$${_proposedPrice!.toStringAsFixed(0)} COP",

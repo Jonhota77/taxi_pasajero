@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../widgets/driver_avatar.dart';
 import 'package:http/http.dart' as http;
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -24,6 +25,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
   String _statusText = "Buscando un conductor disponible...";
   String? _driverName;
   String? _driverPhone;
+  String? _driverPhotoUrl;
   double? _price;
   double? _proposedPrice; // contraoferta del conductor, pendiente de tu decision
   String? _nequiNumber;
@@ -57,12 +59,14 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
           // El conductor propuso un precio distinto -- TU decides, no se acordo nada aun.
           _status = "pending_confirmation";
           _driverName = data["driver_name"];
+          _driverPhotoUrl = data["driver_photo_url"];
           _proposedPrice = (data["proposed_price"] as num?)?.toDouble();
           _statusText = "$_driverName propone un precio distinto";
           break;
         case "order_accepted":
           _status = "accepted";
           _driverName = data["driver_name"];
+          _driverPhotoUrl = data["driver_photo_url"];
           _price = (data["price"] as num?)?.toDouble();
           _nequiNumber = data["nequi_number"];
           _daviplataNumber = data["daviplata_number"];
@@ -99,7 +103,11 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
       );
       if (res.statusCode == 200 && mounted) {
         final order = jsonDecode(res.body);
-        setState(() => _driverPhone = order["driver_phone"]);
+        setState(() {
+          _driverPhone = order["driver_phone"];
+          _driverPhotoUrl = order["driver_photo_url"] ?? _driverPhotoUrl;
+          _driverName = order["driver_name"] ?? _driverName;
+        });
       }
     } catch (_) {}
   }
@@ -130,6 +138,7 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
           _nequiNumber = order["nequi_number"];
           _daviplataNumber = order["daviplata_number"];
           _driverPhone = order["driver_phone"];
+          _driverPhotoUrl = order["driver_photo_url"] ?? _driverPhotoUrl;
           _statusText = "Precio confirmado. $_driverName va en camino.";
         });
       } else {
@@ -162,6 +171,10 @@ class _OrderStatusScreenState extends State<OrderStatusScreen> {
               _buildIcon(),
               const SizedBox(height: 24),
               Text(_statusText, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+              if (_driverName != null && _status != "requested") ...[
+                const SizedBox(height: 16),
+                DriverCard(name: _driverName, photoUrl: _driverPhotoUrl),
+              ],
 
               // Contraoferta pendiente: el pasajero debe decidir
               if (_status == "pending_confirmation" && _proposedPrice != null) ...[
