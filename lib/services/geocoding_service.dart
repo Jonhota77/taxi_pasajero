@@ -16,7 +16,7 @@ class GeocodingService {
   static const double _maxLocalDistanceKm = 60;
 
   static const Map<String, String> _headers = {
-    "User-Agent": "TransportesOJ7App/1.0 (contacto@transportesoj7.com)",
+    "User-Agent": "BipyApp/1.0 (+https://app.192.241.191.157.nip.io/descargar)",
   };
 
   /// NUEVO: detecta en que ciudad esta el punto dado (usando el GPS real
@@ -37,6 +37,54 @@ class GeocodingService {
       final address = data["address"];
       if (address == null) return null;
       return address["city"] ?? address["town"] ?? address["municipality"] ?? address["county"];
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Direccion legible de un punto del mapa, para escribirla en el buscador
+  /// cuando el pasajero toca el mapa. Devuelve null si no hay nada util
+  /// (la app entonces muestra un texto generico).
+  Future<String?> reverseGeocodeAddress(LatLng point) async {
+    final uri = Uri.parse(
+      "https://nominatim.openstreetmap.org/reverse"
+      "?lat=${point.latitude}&lon=${point.longitude}"
+      "&format=jsonv2&addressdetails=1&zoom=18&accept-language=es",
+    );
+    try {
+      final res = await http.get(uri, headers: _headers).timeout(const Duration(seconds: 8));
+      if (res.statusCode != 200) return null;
+      final data = jsonDecode(res.body);
+      if (data is! Map || data["error"] != null) return null;
+
+      final addr = data["address"] is Map
+          ? Map<String, dynamic>.from(data["address"] as Map)
+          : <String, dynamic>{};
+      String? pick(List<String> keys) {
+        for (final k in keys) {
+          final v = addr[k];
+          if (v is String && v.trim().isNotEmpty) return v.trim();
+        }
+        return null;
+      }
+
+      final name = data["name"] is String ? (data["name"] as String).trim() : "";
+      final road = pick(["road", "pedestrian", "footway", "path", "cycleway"]);
+      final house = pick(["house_number"]);
+      final area = pick(["neighbourhood", "suburb", "quarter", "hamlet", "village"]);
+      final town = pick(["city", "town", "municipality", "village", "county"]);
+
+      final parts = <String>[];
+      void add(String? v) {
+        if (v != null && v.isNotEmpty && !parts.contains(v)) parts.add(v);
+      }
+
+      if (name.isNotEmpty && name != road) add(name);
+      if (road != null) add(house != null ? "$road #$house" : road);
+      add(area);
+      add(town);
+      if (parts.isEmpty) return null;
+      return parts.take(3).join(", ");
     } catch (_) {
       return null;
     }

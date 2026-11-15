@@ -42,6 +42,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
   bool _pickupSetManually = false;
   bool _requesting = false;
   bool _searchingAddress = false;
+  int _destReverseSeq = 0; // descarta respuestas viejas si el pasajero toca otro punto
   String? _error;
 
   // Si el pasajero quiere pedir el viaje para mas tarde en vez de ahora.
@@ -142,7 +143,26 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
     });
     // Si la recogida se marco a mano (otro pueblo), se actualiza la ciudad
     // de referencia para la busqueda de direcciones.
-    if (adjusting) _detectCityHint(point);
+    if (adjusting) {
+      _detectCityHint(point);
+    } else {
+      _fillDestinationAddress(point);
+    }
+  }
+
+  /// Al tocar el mapa, escribe en el buscador la direccion del punto elegido.
+  Future<void> _fillDestinationAddress(LatLng point) async {
+    final seq = ++_destReverseSeq;
+    setState(() {
+      _searchingAddress = true;
+      _destAddressController.clear();
+    });
+    final label = await _geocodingService.reverseGeocodeAddress(point);
+    if (!mounted || seq != _destReverseSeq) return;
+    setState(() {
+      _searchingAddress = false;
+      _destAddressController.text = label ?? "Punto marcado en el mapa";
+    });
   }
 
   /// Busca la direccion escrita y coloca el punto de destino solo, sin que
@@ -153,6 +173,7 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
 
     setState(() {
       _searchingAddress = true;
+      _destReverseSeq++;
       _error = null;
     });
 
@@ -185,6 +206,8 @@ class _HomeMapScreenState extends State<HomeMapScreen> {
       _adjustingPickup = false;
       _pickupSetManually = false;
       _destAddressController.clear();
+      _destReverseSeq++;
+      _searchingAddress = false;
     });
     _getCurrentLocation();
   }

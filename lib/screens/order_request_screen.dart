@@ -40,6 +40,8 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
   bool _requesting = false;
   bool _searchingPickup = false;
   bool _searchingDestination = false;
+  int _pickupReverseSeq = 0; // descartan respuestas viejas si el cliente toca otro punto
+  int _destReverseSeq = 0;
   String? _error;
 
   bool get _isPiaggio => widget.serviceType == "piaggio";
@@ -106,7 +108,43 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
     });
     // Si la recogida se marco a mano (otro pueblo), se actualiza la ciudad
     // de referencia para la busqueda de direcciones.
-    if (adjusting) _detectCityHint(point);
+    if (adjusting) {
+      // primero la ciudad y despues la direccion, para no lanzar dos consultas a la vez
+      _fillPickupAddress(point, after: _detectCityHint(point));
+    } else {
+      _fillDestinationAddress(point);
+    }
+  }
+
+  /// Al marcar la recogida en el mapa, escribe su direccion en el buscador.
+  Future<void> _fillPickupAddress(LatLng point, {Future<void>? after}) async {
+    final seq = ++_pickupReverseSeq;
+    setState(() {
+      _searchingPickup = true;
+      _pickupAddressController.clear();
+    });
+    if (after != null) await after;
+    final label = await _geocodingService.reverseGeocodeAddress(point);
+    if (!mounted || seq != _pickupReverseSeq) return;
+    setState(() {
+      _searchingPickup = false;
+      _pickupAddressController.text = label ?? "Punto de recogida marcado en el mapa";
+    });
+  }
+
+  /// Al tocar el mapa, escribe en el buscador la direccion del destino elegido.
+  Future<void> _fillDestinationAddress(LatLng point) async {
+    final seq = ++_destReverseSeq;
+    setState(() {
+      _searchingDestination = true;
+      _destAddressController.clear();
+    });
+    final label = await _geocodingService.reverseGeocodeAddress(point);
+    if (!mounted || seq != _destReverseSeq) return;
+    setState(() {
+      _searchingDestination = false;
+      _destAddressController.text = label ?? "Punto marcado en el mapa";
+    });
   }
 
   void _startAdjustingPickup() {
@@ -121,6 +159,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
 
     setState(() {
       _searchingPickup = true;
+      _pickupReverseSeq++;
       _error = null;
     });
 
@@ -149,6 +188,7 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
 
     setState(() {
       _searchingDestination = true;
+      _destReverseSeq++;
       _error = null;
     });
 
@@ -172,6 +212,10 @@ class _OrderRequestScreenState extends State<OrderRequestScreen> {
       _adjustingPickup = false;
       _pickupSetManually = false;
       _pickupAddressController.clear();
+      _pickupReverseSeq++;
+      _destReverseSeq++;
+      _searchingPickup = false;
+      _searchingDestination = false;
       _destAddressController.clear();
     });
     _getCurrentLocation();
